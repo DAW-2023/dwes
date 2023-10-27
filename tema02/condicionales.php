@@ -1,6 +1,8 @@
 <?php
 $title = "Condicionales";
-include_once("../includes/head.php");
+
+$level = (sizeof(explode("/", $_SERVER["PHP_SELF"])) >= 4) ? "../" : "";
+include_once($level."includes/head.php");
 ?>
 
 <h2>Tema 2</h2>
@@ -66,5 +68,5 @@ if (isset($_POST["motor"])) {
 ?>
 
 <?php
-include_once("../includes/footer.php");
+include_once($level."includes/footer.php");
 ?>

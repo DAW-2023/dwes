@@ -1,9 +1,9 @@
 <?php
-include_once("../functions/dates.php");
+include($level."functions/dates.php");
 ?>
 
 <hr>
-<?=getCurrentDate() ?>
+<?= getCurrentDate() ?>
     
 </body>
 </html>
