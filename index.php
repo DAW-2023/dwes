@@ -14,6 +14,8 @@ include( $level."includes/head.php");
 			<li><a href="tema02/fechas.php">Fechas</a></li>
 			<li><a href="tema02/condicionales.php">Condicionales</a></li>
 			<li><a href="tema02/funciones.php">Funciones</a></li>
+			<li><a href="tema02/foreach.php">foreach</a></li>
+			<li><a href="tema02/validar-formulario.php">Validar formulario</a></li>
 		</ul>
 	</li>
 </ul>
