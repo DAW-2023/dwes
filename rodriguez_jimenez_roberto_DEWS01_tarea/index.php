@@ -4,6 +4,11 @@ include("funciones.inc.php");
 // Declaramos un array agenda
 $agenda = [];
 
+// Crear una variable para comprobar el error rápidamente.
+// En caso de haber error, debemos recuperar los campos tal y
+// como estaban.
+$hayError = false;
+
 // Comprobar si existen datos recibidos desde el formulario para poder procesarlos
 if (count($_POST) > 0) {
 
@@ -26,8 +31,22 @@ if (count($_POST) > 0) {
             $_POST['nombre'],
             $_POST['telefono']
         );
+    } else {
+        // Indicamos que hay un error
+        $hayError = true;
+
+        // Debemos propagar la agenda, si no se hace, se pierden los datos.
+        $agenda = $_POST['agenda'];
     }
 }
+
+// Acciones solicitadas por get
+if (count($_GET) > 0) {
+    if (isset($_GET['vaciar']) && $_GET['vaciar'] == 1) {
+        reset($agenda);
+    }
+}
+
 
 ?>
 <!DOCTYPE html>
@@ -44,9 +63,11 @@ if (count($_POST) > 0) {
 
     <h1>Agenda</h1>
 
-    <?php if (isset($errores) && in_array(0, $errores)): ?>
+    <?php if ($hayError): ?>
         <div class="error">
-            <?= getError(0) ?>
+            <?php foreach ($errores as $error): ?>
+                <?= getError($error) ?><br>
+            <?php endforeach ?>
         </div>
     <?php endif ?>
 
@@ -72,15 +93,15 @@ if (count($_POST) > 0) {
         </fieldset>
     <?php endif ?>
 
-    <form action="" method="post">
-        <fieldset>
-            <legend>Nuevo contacto</legend>
+    <fieldset>
+        <legend>Nuevo contacto</legend>
+        <form action="" method="post">
             <div class="row">
                 <div class="col label">
                     <label for="nombre" id="nombre">Nombre:</label>
                 </div>
                 <div class="col">
-                    <input type="text" name="nombre" id="nombre" maxlength="50" placeholder="Mín. 3 caracteres">
+                    <input type="text" name="nombre" id="nombre" maxlength="50" placeholder="Mín. 3 caracteres" <?php if ($hayError): ?> value="<?= $_POST['nombre'] ?>" <?php endif ?>>
                 </div>
             </div>
             <div class="row">
@@ -88,27 +109,35 @@ if (count($_POST) > 0) {
                     <label for="telefono">Telefono:</label>
                 </div>
                 <div class="col">
-                    <input type="tel" name="telefono" id="telefono" placeholder="123456789" pattern="[0-9]{9}">
+                    <input type="tel" name="telefono" id="telefono" placeholder="123456789" pattern="[0-9]{9}" <?php if ($hayError): ?> value="<?= $_POST['telefono'] ?>" <?php endif ?>>
                 </div>
             </div>
-            <input type="submit" value="Añadir contacto" id="anadir">
-            <input type="reset" value="Limpiar campos" id="reset">
 
             <!-- enviamos la agenda -->
             <?php foreach ($agenda as $key => $value): ?>
                 <input type="hidden" name="agenda[<?= $key ?>]" value="<?= $value ?>">
             <?php endforeach ?>
 
-        </fieldset>
-    </form>
+            <div style="display:flex">
+            <input type="submit" value="Añadir contacto" id="anadir">
+
+        </form>
+
+        <form action="" id="form-limpiar" method="get" name="form-limpiar">
+            <button type="submit" value="1" name="limpiar" id="1">Limpiar campos</button>
+        </form>
+            </div>
+    </fieldset>
+
+
 
     <?php if (count($agenda) >= 1): ?>
-        <fieldset>
-            <legend>Vaciar agenda</legend>
-            <form action="?vaciar=1" id="vaciar" method="get"></form>
-                <input type="submit" value="vaciar" name="vaciar" id="vaciar">
-            </form>
-        </fieldset>
+        <form action="" id="form-vaciar" method="get" name="form-vaciar">
+            <fieldset>
+                <legend>Vaciar agenda</legend>
+                <button type="submit" value="1" name="vaciar" id="1">Vaciar</button>
+            </fieldset>
+        </form>
     <?php endif ?>
 
 </body>
