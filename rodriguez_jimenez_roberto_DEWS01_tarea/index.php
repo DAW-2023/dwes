@@ -9,6 +9,9 @@ $agenda = [];
 // como estaban.
 $hayError = false;
 
+// Estamos atentos a si hay que limpiar los campos de los formularios
+$hayQueLimpiar = false;
+
 // Comprobar si existen datos recibidos desde el formulario para poder procesarlos
 if (count($_POST) > 0) {
 
@@ -35,22 +38,40 @@ if (count($_POST) > 0) {
         // Indicamos que hay un error
         $hayError = true;
 
-        // Debemos propagar la agenda, si no se hace, se pierden los datos.
-        $agenda = $_POST['agenda'];
+        // Si hay agenda, debemos propagarla, si no se hace, se pierden los datos.
+        if (isset($_POST['agenda'])) {
+            $agenda = $_POST['agenda'];
+        }
     }
 }
 
 // Acciones solicitadas por get
 if (count($_GET) > 0) {
-    if (isset($_GET['vaciar']) && $_GET['vaciar'] == 1) {
-        reset($agenda);
+    switch ($_GET) {
+
+        case 'vaciar':
+            if ($_GET['vaciar'] == 1) {
+                reset($agenda);
+            }
+            break;
+        case 'limpiar':
+            $_POST['nombre'] = '';
+            $_POST['telefono'] = '';
+            // Si hay agenda, debemos propagarla, si no se hace, se pierden los datos.
+            if (isset($_POST['agenda'])) {
+                $agenda = $_POST['agenda'];
+            }
+            break;
+
     }
+
+
 }
 
 
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
@@ -101,7 +122,7 @@ if (count($_GET) > 0) {
                     <label for="nombre" id="nombre">Nombre:</label>
                 </div>
                 <div class="col">
-                    <input type="text" name="nombre" id="nombre" maxlength="50" placeholder="Mín. 3 caracteres" <?php if ($hayError): ?> value="<?= $_POST['nombre'] ?>" <?php endif ?>>
+                    <input type="text" name="nombre" id="nombre" maxlength="50" placeholder="Mín. 3 caracteres" <?php if ($hayError || $hayQueLimpiar): ?> value="<?= $_POST['nombre'] ?>" <?php endif ?>>
                 </div>
             </div>
             <div class="row">
@@ -109,7 +130,7 @@ if (count($_GET) > 0) {
                     <label for="telefono">Telefono:</label>
                 </div>
                 <div class="col">
-                    <input type="tel" name="telefono" id="telefono" placeholder="123456789" pattern="[0-9]{9}" <?php if ($hayError): ?> value="<?= $_POST['telefono'] ?>" <?php endif ?>>
+                    <input type="tel" name="telefono" id="telefono" placeholder="123456789" pattern="[0-9]{9}" <?php if ($hayError || $hayQueLimpiar): ?> value="<?= $_POST['telefono'] ?>" <?php endif ?>>
                 </div>
             </div>
 
@@ -118,15 +139,15 @@ if (count($_GET) > 0) {
                 <input type="hidden" name="agenda[<?= $key ?>]" value="<?= $value ?>">
             <?php endforeach ?>
 
-            <div style="display:flex">
-            <input type="submit" value="Añadir contacto" id="anadir">
+            <div class="botones">
+                <input type="submit" value="Añadir contacto" id="anadir">
 
         </form>
 
         <form action="" id="form-limpiar" method="get" name="form-limpiar">
             <button type="submit" value="1" name="limpiar" id="1">Limpiar campos</button>
         </form>
-            </div>
+        </div>
     </fieldset>
 
 

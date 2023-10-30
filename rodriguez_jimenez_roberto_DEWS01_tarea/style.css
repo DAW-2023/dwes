@@ -34,3 +34,9 @@ td{
 td.telefono{
     text-align: center;
 }
+
+.botones{
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
