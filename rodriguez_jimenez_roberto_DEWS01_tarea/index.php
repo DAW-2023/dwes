@@ -1,24 +1,33 @@
 <?php
-session_start();
-
-// Agenda es una variable de sessión
-if(!isset($_SESSION['agenda'])) {
-    $_SESSION['agenda'] = [];
-}
-
 include("funciones.inc.php");
 
-// Existen datos desde el formulario
+// Declaramos un array agenda
+$agenda = [];
+
+// Comprobar si existen datos recibidos desde el formulario para poder procesarlos
 if (count($_POST) > 0) {
+
+    // Validamos el formulario y recibimos un array con 
+    // los id de los errores encontrados.
     $errores = validarFormulario();
 
-    // No hay errores, guardamos los datos
+    // Si no hay errores, procesamos los datos del formulario.
     if (count($errores) == 0) {
-        procesarDatos();
+
+        // En este punto sabemos que tenemos los datos del formulario sin errores.
+        // Es posible que en la agenda no haya datos aún, por lo que no existirá 
+        // el campo $_POST['agenda']
+
+        // procesarDatos 
+        // Si la agenda está vacía, no puede existir $_POST['agenda'] ya que no se han 
+        // podido crear los campos 'hiddden', entonces enviamos la agenda vacía.
+        $agenda = procesarAgenda(
+            isset($_POST['agenda']) ? $_POST['agenda'] : $agenda,
+            $_POST['nombre'],
+            $_POST['telefono']
+        );
     }
 }
-
-
 
 ?>
 <!DOCTYPE html>
@@ -41,6 +50,28 @@ if (count($_POST) > 0) {
         </div>
     <?php endif ?>
 
+    <?php if (count($agenda) >= 1): ?>
+        <fieldset>
+            <legend>Agenda</legend>
+            <table>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Teléfono</th>
+                </tr>
+                <?php foreach ($agenda as $key => $value): ?>
+                    <tr>
+                        <td>
+                            <?= $key ?>
+                        </td>
+                        <td class="telefono">
+                            <?= $value ?>
+                        </td>
+                    </tr>
+                <?php endforeach ?>
+            </table>
+        </fieldset>
+    <?php endif ?>
+
     <form action="" method="post">
         <fieldset>
             <legend>Nuevo contacto</legend>
@@ -57,15 +88,28 @@ if (count($_POST) > 0) {
                     <label for="telefono">Telefono:</label>
                 </div>
                 <div class="col">
-                    <input type="tel" name="telefono" id="telefono" placeholder="123456789" pattern="[0-9]{9}" required>
+                    <input type="tel" name="telefono" id="telefono" placeholder="123456789" pattern="[0-9]{9}">
                 </div>
             </div>
             <input type="submit" value="Añadir contacto" id="anadir">
             <input type="reset" value="Limpiar campos" id="reset">
+
+            <!-- enviamos la agenda -->
+            <?php foreach ($agenda as $key => $value): ?>
+                <input type="hidden" name="agenda[<?= $key ?>]" value="<?= $value ?>">
+            <?php endforeach ?>
+
         </fieldset>
     </form>
 
-    <?php print_r($_SESSION["agenda"]); ?>
+    <?php if (count($agenda) >= 1): ?>
+        <fieldset>
+            <legend>Vaciar agenda</legend>
+            <form action="?vaciar=1" id="vaciar" method="get"></form>
+                <input type="submit" value="vaciar" name="vaciar" id="vaciar">
+            </form>
+        </fieldset>
+    <?php endif ?>
 
 </body>
 

@@ -1,21 +1,35 @@
 <?php
 
 /**
- * función para procesar el formulario.
- * Se confía en que el formulario es correcto, no es misión de
- * esta función validar el formulario.
+ * Función que actualiza la agenda a partir de la agenda recibida 
+ * como parámetro y los datos recibidos por post.
+ * @param mixed $datos contiene un array [nombre]:teléfono
+ * @param string $nombre es el nombre del contacto que se guaradará en la agenda
+ * @param string $telefono número asociado al contacto
  */
-function procesarDatos()
+function procesarAgenda($datos, $nombre, $telefono)
 {
+    $agenda = $datos;
 
-    // Si el nombre no existe y hay número, se añade a la agenda
-    if (!in_array($_POST['nombre'], $_SESSION['agenda'])) {
-        $_SESSION['agenda'][$_POST['nombre']] = $_POST['telefono'];
+    // si se ha recibido el nombre y el teléfono
+    if (!empty($nombre)) {
+
+        if (!empty($telefono)) {
+            // Tanto si el nombre ya existe como si es nuevo, se asigna el teléfono al nombre.
+            $agenda[$nombre] = $telefono;
+        } else {
+            // Teléfono vacío, se borra el registro
+            unset($agenda[$nombre]);
+        }
+
     }
+
+    return $agenda;
 }
 
 /**
- * Función que devuelve el error pedido
+ * Función que devuelve el error pedido.
+ * Se especifican errores que podrían no producirse, pero ya quedan indicados.
  */
 function getError($err)
 {
@@ -30,25 +44,28 @@ function getError($err)
 }
 
 /**
- * Función que valida el formulario
+ * Función que valida el formulario recipido por post
+ * @return mixed devulve un array con el id de los errores encontrados.
  */
 function validarFormulario()
 {
 
     $errores = [];
 
-    // Validar el nombre si se ha recibido
+    // Validar el nombre si se ha recibido.
     if (!isset($_POST["nombre"]) || empty($_POST['nombre'])) {
         $errores[] = 0;
     } else if (!validarNombre($_POST['nombre'])) {
         $errores[] = 1;
     }
 
-    // Validar el teléfono si se ha recibido
-
-    if (!isset($_POST["telefono"])) {
-        $errores[] = 2;
-    } else if (!validarTelefono($_POST["telefono"])) {
+    // Validar el teléfono si se ha recibido.
+    // El teléfono no es obligatorio, por lo que se valida solo si ha sido recibido.
+    if (
+        isset($_POST["telefono"])
+        && !empty($_POST['telefono'])
+        && !validarTelefono($_POST["telefono"])
+    ) {
         $errores[] = 3;
     }
 
