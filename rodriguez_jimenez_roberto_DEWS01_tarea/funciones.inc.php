@@ -1,6 +1,36 @@
 <?php
 
 /**
+ * Función que valida el formulario recipido por post
+ * @return mixed devulve un array con el id de los errores encontrados.
+ */
+function validarFormulario()
+{
+
+    $errores = [];
+
+    // Validar el nombre si se ha recibido.
+    if (!isset($_POST["nombre"]) || empty($_POST['nombre'])) {
+        $errores[] = 0;
+    } else if (!validarNombre($_POST['nombre'])) {
+        $errores[] = 1;
+    }
+
+    // Validar el teléfono si se ha recibido.
+    // El teléfono no es obligatorio, por lo que se valida solo si ha sido recibido.
+    if (
+        isset($_POST["telefono"])
+        && !empty($_POST['telefono'])
+        && !validarTelefono($_POST["telefono"])
+    ) {
+        $errores[] = 3;
+    }
+
+    return $errores;
+
+}
+
+/**
  * Función que actualiza la agenda a partir de la agenda recibida 
  * como parámetro y los datos recibidos por post.
  * @param mixed $datos contiene un array [nombre]:teléfono
@@ -43,35 +73,7 @@ function getError($err)
     return $errores[$err];
 }
 
-/**
- * Función que valida el formulario recipido por post
- * @return mixed devulve un array con el id de los errores encontrados.
- */
-function validarFormulario()
-{
 
-    $errores = [];
-
-    // Validar el nombre si se ha recibido.
-    if (!isset($_POST["nombre"]) || empty($_POST['nombre'])) {
-        $errores[] = 0;
-    } else if (!validarNombre($_POST['nombre'])) {
-        $errores[] = 1;
-    }
-
-    // Validar el teléfono si se ha recibido.
-    // El teléfono no es obligatorio, por lo que se valida solo si ha sido recibido.
-    if (
-        isset($_POST["telefono"])
-        && !empty($_POST['telefono'])
-        && !validarTelefono($_POST["telefono"])
-    ) {
-        $errores[] = 3;
-    }
-
-    return $errores;
-
-}
 
 /**
  * Valida el nombre del usuario recibido como parámetro.
@@ -93,7 +95,7 @@ function validarNombre($nombre)
     return ((preg_match($pattern, $temp) == 1) && (strlen($temp) >= 3)) ? true : false;
 
 }
-
+                       
 /**
  * Valida el número de teléfono.
  * @return boolean true si el número de teléfono es válido.

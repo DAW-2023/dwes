@@ -5,12 +5,8 @@ include("funciones.inc.php");
 $agenda = [];
 
 // Crear una variable para comprobar el error rápidamente.
-// En caso de haber error, debemos recuperar los campos tal y
-// como estaban.
+// En caso de haber error, debemos recuperar los campos tal y como estaban.
 $hayError = false;
-
-// Estamos atentos a si hay que limpiar los campos de los formularios
-$hayQueLimpiar = false;
 
 // Comprobar si existen datos recibidos desde el formulario para poder procesarlos
 if (count($_POST) > 0) {
@@ -18,9 +14,10 @@ if (count($_POST) > 0) {
     // Validamos el formulario y recibimos un array con 
     // los id de los errores encontrados.
     $errores = validarFormulario();
+    $hayError = count($errores) >= 1;
 
     // Si no hay errores, procesamos los datos del formulario.
-    if (count($errores) == 0) {
+    if (!$hayError) {
 
         // En este punto sabemos que tenemos los datos del formulario sin errores.
         // Es posible que en la agenda no haya datos aún, por lo que no existirá 
@@ -35,9 +32,6 @@ if (count($_POST) > 0) {
             $_POST['telefono']
         );
     } else {
-        // Indicamos que hay un error
-        $hayError = true;
-
         // Si hay agenda, debemos propagarla, si no se hace, se pierden los datos.
         if (isset($_POST['agenda'])) {
             $agenda = $_POST['agenda'];
@@ -45,27 +39,11 @@ if (count($_POST) > 0) {
     }
 }
 
-// Acciones solicitadas por get
+// Acciones solicitadas por get (vaciar la agenda)
 if (count($_GET) > 0) {
-    switch ($_GET) {
-
-        case 'vaciar':
-            if ($_GET['vaciar'] == 1) {
-                reset($agenda);
-            }
-            break;
-        case 'limpiar':
-            $_POST['nombre'] = '';
-            $_POST['telefono'] = '';
-            // Si hay agenda, debemos propagarla, si no se hace, se pierden los datos.
-            if (isset($_POST['agenda'])) {
-                $agenda = $_POST['agenda'];
-            }
-            break;
-
+    if (isset($_GET['vaciar']) && ($_GET['vaciar'] == 1)) {
+        reset($agenda);
     }
-
-
 }
 
 
@@ -122,7 +100,7 @@ if (count($_GET) > 0) {
                     <label for="nombre" id="nombre">Nombre:</label>
                 </div>
                 <div class="col">
-                    <input type="text" name="nombre" id="nombre" maxlength="50" placeholder="Mín. 3 caracteres" <?php if ($hayError || $hayQueLimpiar): ?> value="<?= $_POST['nombre'] ?>" <?php endif ?>>
+                    <input type="text" name="nombre" id="nombre" maxlength="50" placeholder="Mín. 3 caracteres" <?php if ($hayError): ?> value="<?= $_POST['nombre'] ?>" <?php endif ?>>
                 </div>
             </div>
             <div class="row">
@@ -130,7 +108,7 @@ if (count($_GET) > 0) {
                     <label for="telefono">Telefono:</label>
                 </div>
                 <div class="col">
-                    <input type="tel" name="telefono" id="telefono" placeholder="123456789" pattern="[0-9]{9}" <?php if ($hayError || $hayQueLimpiar): ?> value="<?= $_POST['telefono'] ?>" <?php endif ?>>
+                    <input type="tel" name="telefono" id="telefono" placeholder="123456789" pattern="[0-9]{9}" <?php if ($hayError): ?> value="<?= $_POST['telefono'] ?>" <?php endif ?>>
                 </div>
             </div>
 
@@ -141,12 +119,11 @@ if (count($_GET) > 0) {
 
             <div class="botones">
                 <input type="submit" value="Añadir contacto" id="anadir">
+                <input type="reset" value="Limpiar campos" id="limpiar">
+            </div>
 
         </form>
 
-        <form action="" id="form-limpiar" method="get" name="form-limpiar">
-            <button type="submit" value="1" name="limpiar" id="1">Limpiar campos</button>
-        </form>
         </div>
     </fieldset>
 
